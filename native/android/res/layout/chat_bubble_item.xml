@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_marginVertical="4dp">
+
+    <!-- Normal Text Display -->
+    <TextView
+        android:id="@+id/bubble_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"
+        android:visibility="visible"/>
+
+    <!-- Code Block Container -->
+    <LinearLayout
+        android:id="@+id/code_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/code_block_bg"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/code_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#E6E1DC"
+            android:typeface="monospace"
+            android:textSize="14sp"/>
+
+        <ImageButton
+            android:id="@+id/copy_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_copy"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Copy code"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:tint="#E6E1DC"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,23 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Backgrounds -->
+    <color name="bg_primary">#121212</color>
+    <color name="bg_secondary">#1E1E1E</color>
+    <color name="bg_card">#252525</color>
+
+    <!-- Text -->
+    <color name="text_primary">#E0E0E0</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#4A4A4A</color>
+
+    <!-- Accents -->
+    <color name="accent_blue">#4FC3F7</color>
+    <color name="accent_green">#81C784</color>
+    <color name="accent_amber">#FFD54F</color>
+    <color name="accent_red">#E57373</color>
+
+    <!-- UI Elements -->
+    <color name="input_field_fill">#2C2C2C</color>
+    <color name="border_divider">#333333</color>
+</resources>

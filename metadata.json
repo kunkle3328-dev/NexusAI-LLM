@@ -1,0 +1,9 @@
+{
+  "name": "NexusAI Mobile",
+  "description": "A self-contained, high-performance mobile AI agent. Local storage, RAG memory, and advanced reasoning.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "geolocation"
+  ]
+}

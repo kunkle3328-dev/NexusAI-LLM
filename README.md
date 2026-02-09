@@ -1,11 +1,17 @@
-<div align="center">
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+# Nexus AI Mobile Ready-to-Build
 
-  <h1>Built with AI Studio</h2>
+## Prerequisites
+1. Android Studio with NDK support.
+2. Chaquopy plugin installed in Gradle.
+3. Physical ARM64 Android device (min SDK 26).
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Deployment
+1. Download `llama3-8b-instruct-q4_K_M.gguf` and place it in `app/src/main/python/binaries/`.
+2. Place `whisper.onnx` and `piper.onnx` in the same directory.
+3. Sync Gradle and Run.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
-
-</div>
+## Architecture
+- **Inference**: llama-cpp-python running on mobile CPU.
+- **Voice**: Whisper (STT) and Piper (TTS) for natural interaction.
+- **Privacy**: 100% Offline. All prompts are device-bound.

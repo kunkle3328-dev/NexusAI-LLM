@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NexusAI | Mobile Local Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            background-color: #f9fafb;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Mobile App Layout */
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--safe-area-top);
+            padding-bottom: var(--safe-area-bottom);
+        }
+
+        /* Message Animations */
+        @keyframes messageSlide {
+            from { transform: translateY(16px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .message-bubble {
+            animation: messageSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        .dark .glass {
+            background: rgba(13, 13, 13, 0.88);
+        }
+        
+        /* Professional Content Formatting */
+        .content-formatted p {
+            margin-bottom: 0.85rem;
+            line-height: 1.6;
+        }
+        .content-formatted p:last-child {
+            margin-bottom: 0;
+        }
+        .content-formatted code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.06);
+            padding: 0.15rem 0.3rem;
+            border-radius: 0.3rem;
+            font-size: 0.9em;
+        }
+        .dark .content-formatted code {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .code-block {
+            background: #111111;
+            color: #e4e4e4;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .content-formatted ul, .content-formatted ol {
+            margin-bottom: 0.85rem;
+            padding-left: 1.25rem;
+        }
+        .content-formatted li {
+            margin-bottom: 0.4rem;
+        }
+        .content-formatted h1, .content-formatted h2, .content-formatted h3 {
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background: #2563eb44;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+  }
+}
+</script>
+</head>
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div id="root"></div>
+</body>
+</html>

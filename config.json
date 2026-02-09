@@ -1,0 +1,8 @@
+
+{
+  "project": "Nexus AI Mobile",
+  "version": "1.0.0",
+  "engine": "llama-cpp-python",
+  "optimization": "ARM64_NEON",
+  "enclave_mode": "Fully Offline"
+}
