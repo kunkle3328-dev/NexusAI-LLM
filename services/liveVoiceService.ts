@@ -1,10 +1,7 @@
 
 import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
+import { Emotion } from '../types';
 
-/**
- * NEXUS LIVE VOICE SERVICE
- * v4.3.0 - Optimized for Gemini 2.5 Native Audio Duplexing.
- */
 export class LiveVoiceService {
   private ai: GoogleGenAI;
   private sessionPromise: Promise<any> | null = null;
@@ -15,19 +12,31 @@ export class LiveVoiceService {
   private scriptProcessor: ScriptProcessorNode | null = null;
   private sources: Set<AudioBufferSourceNode> = new Set();
   private stream: MediaStream | null = null;
+  private currentEmotion: Emotion = 'neutral';
 
   constructor() {
     this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
 
-  async start(callbacks: {
+  private getProsodyAdjustment(emotion: Emotion) {
+    switch(emotion) {
+      case 'excited': return { playbackRate: 1.15, gain: 1.2 };
+      case 'empathetic': return { playbackRate: 0.92, gain: 0.8 };
+      case 'confident': return { playbackRate: 1.05, gain: 1.1 };
+      case 'curious': return { playbackRate: 1.08, gain: 1.0 };
+      default: return { playbackRate: 1.0, gain: 1.0 };
+    }
+  }
+
+  async start(config: {
+    voiceName: string;
+    systemInstruction: string;
+  }, callbacks: {
     onMessage: (text: string, isUser: boolean) => void;
     onError: (err: any) => void;
     onClose: () => void;
   }) {
-    // Reset state for new session
-    this.nextStartTime = 0;
-    this.sources.clear();
+    this.stop();
 
     this.inputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
     this.outputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
@@ -37,7 +46,7 @@ export class LiveVoiceService {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (e) {
-      callbacks.onError(new Error("Neural Interface Failed: Mic Access Denied"));
+      callbacks.onError(new Error("Microphone Access Denied"));
       return;
     }
 
@@ -64,10 +73,16 @@ export class LiveVoiceService {
           this.scriptProcessor.connect(this.inputAudioContext.destination);
         },
         onmessage: async (message: LiveServerMessage) => {
-          // Live Transcription Routing
           if (message.serverContent?.outputTranscription) {
-            currentOutputTranscription += message.serverContent.outputTranscription.text;
+            const text = message.serverContent.outputTranscription.text;
+            currentOutputTranscription += text;
             callbacks.onMessage(currentOutputTranscription, false);
+            
+            // Simple Emotion Inference
+            if (text.includes('!') || text.toLowerCase().includes('great')) this.currentEmotion = 'excited';
+            else if (text.toLowerCase().includes('sorry')) this.currentEmotion = 'empathetic';
+            else this.currentEmotion = 'neutral';
+
           } else if (message.serverContent?.inputTranscription) {
             currentInputTranscription += message.serverContent.inputTranscription.text;
             callbacks.onMessage(currentInputTranscription, true);
@@ -76,29 +91,32 @@ export class LiveVoiceService {
           if (message.serverContent?.turnComplete) {
             currentInputTranscription = '';
             currentOutputTranscription = '';
+            this.currentEmotion = 'neutral';
           }
 
-          // Human-prosody Audio Queueing
           const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
           if (base64Audio && this.outputAudioContext) {
+            const prosody = this.getProsodyAdjustment(this.currentEmotion);
             this.nextStartTime = Math.max(this.nextStartTime, this.outputAudioContext.currentTime);
             const audioBuffer = await this.decodeAudioData(this.decode(base64Audio), this.outputAudioContext, 24000, 1);
             const source = this.outputAudioContext.createBufferSource();
+            
             source.buffer = audioBuffer;
+            source.playbackRate.value = prosody.playbackRate;
+            this.outputNode!.gain.value = prosody.gain;
+            
             source.connect(this.outputNode!);
             source.addEventListener('ended', () => this.sources.delete(source));
             source.start(this.nextStartTime);
-            this.nextStartTime += audioBuffer.duration;
+            this.nextStartTime += (audioBuffer.duration / prosody.playbackRate);
             this.sources.add(source);
           }
 
-          // Barge-in / Interruption Support
           if (message.serverContent?.interrupted) {
             this.sources.forEach(s => { try { s.stop(); } catch(e){} });
             this.sources.clear();
             this.nextStartTime = 0;
             currentOutputTranscription = '';
-            console.warn("Nexus Enclave: Interruption Detected. Halting TTS Output.");
           }
         },
         onerror: callbacks.onError,
@@ -107,41 +125,34 @@ export class LiveVoiceService {
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: config.voiceName } },
         },
         inputAudioTranscription: {},
         outputAudioTranscription: {},
-        systemInstruction: 'You are Nexus AI. Speak naturally like a real human. Be concise, professional, and conversational. Support barge-in interruption naturally.',
+        systemInstruction: config.systemInstruction,
       },
     });
   }
 
   stop() {
-    // 1. Close session
     this.sessionPromise?.then(s => {
       try { s.close(); } catch(e) {}
     });
     
-    // 2. Stop microphone tracks
     if (this.stream) {
       this.stream.getTracks().forEach(t => t.stop());
       this.stream = null;
     }
 
-    // 3. Disconnect audio nodes
     if (this.scriptProcessor) {
       this.scriptProcessor.disconnect();
       this.scriptProcessor.onaudioprocess = null;
       this.scriptProcessor = null;
     }
 
-    // 4. Stop all current playback sources
-    this.sources.forEach(s => {
-      try { s.stop(); } catch(e) {}
-    });
+    this.sources.forEach(s => { try { s.stop(); } catch(e) {} });
     this.sources.clear();
 
-    // 5. Close audio contexts
     if (this.inputAudioContext && this.inputAudioContext.state !== 'closed') {
       this.inputAudioContext.close();
       this.inputAudioContext = null;
@@ -153,6 +164,7 @@ export class LiveVoiceService {
     
     this.sessionPromise = null;
     this.nextStartTime = 0;
+    this.currentEmotion = 'neutral';
   }
 
   private createBlob(data: Float32Array): Blob {

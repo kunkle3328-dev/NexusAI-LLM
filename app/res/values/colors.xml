@@ -1,0 +1,14 @@
+
+<resources>
+    <color name="background">#121212</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#AAAAAA</color>
+    <color name="input_bg">#1E1E1E</color>
+    <color name="spinner_bg">#1E1E1E</color>
+    <color name="bubble_ai">#2E2E2E</color>
+    <color name="bubble_user">#3E3E3E</color>
+    <color name="code_block_bg">#1B1B1B</color>
+    <color name="code_text">#C5C8C6</color>
+    <color name="voice_orb_idle">#4CAF50</color>
+    <color name="voice_orb_active">#81C784</color>
+</resources>

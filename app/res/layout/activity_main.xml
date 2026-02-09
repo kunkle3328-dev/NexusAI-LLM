@@ -1,0 +1,66 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="8dp">
+
+    <!-- Model Selector Dropdown -->
+    <Spinner
+        android:id="@+id/model_selector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:spinnerMode="dropdown"
+        android:background="@drawable/spinner_bg"/>
+
+    <!-- Chat RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
+    <!-- Input + Send + Voice -->
+    <LinearLayout
+        android:id="@+id/input_container"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/input_field"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Type or speak..."
+            android:background="@drawable/input_bg"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:imeOptions="actionSend"/>
+
+        <ImageButton
+            android:id="@+id/send_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_send"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Send"/>
+
+        <ImageButton
+            android:id="@+id/voice_orb"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_voice"
+            android:background="@drawable/voice_orb_bg"
+            android:contentDescription="Voice"/>
+    </LinearLayout>
+</LinearLayout>

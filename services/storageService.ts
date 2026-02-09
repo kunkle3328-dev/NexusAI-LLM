@@ -1,21 +1,23 @@
 
-import { ChatSession, CognitiveMemory } from '../types';
+import { ChatSession, CognitiveMemory, ToolPermission } from '../types';
 
 const DB_NAME = 'NexusAI_V3_Local';
 const STORES = {
   SESSIONS: 'sessions',
-  MEMORIES: 'cognitive_memory'
+  MEMORIES: 'cognitive_memory',
+  PERMISSIONS: 'tool_permissions'
 };
 
 export class StorageService {
   private static async getDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, 3);
+      const request = indexedDB.open(DB_NAME, 4); // Incremented version
       request.onupgradeneeded = (e) => {
         const db = request.result;
         Object.values(STORES).forEach(store => {
           if (!db.objectStoreNames.contains(store)) {
-            db.createObjectStore(store, { keyPath: 'id' });
+            const keyPath = store === STORES.PERMISSIONS ? 'tool' : 'id';
+            db.createObjectStore(store, { keyPath });
           }
         });
       };
@@ -71,5 +73,23 @@ export class StorageService {
       .filter(m => terms.some(t => m.content.toLowerCase().includes(t) || m.tags.some(tag => tag.includes(t))))
       .sort((a, b) => b.importance - a.importance)
       .slice(0, 5);
+  }
+
+  // --- Tool Permission Methods ---
+  static async getToolPermission(toolName: string): Promise<ToolPermission | null> {
+    const db = await this.getDB();
+    const tx = db.transaction(STORES.PERMISSIONS, 'readonly');
+    const store = tx.objectStore(STORES.PERMISSIONS);
+    return new Promise((resolve) => {
+      const request = store.get(toolName);
+      request.onsuccess = () => resolve(request.result || null);
+    });
+  }
+
+  static async saveToolPermission(permission: ToolPermission): Promise<void> {
+    const db = await this.getDB();
+    const tx = db.transaction(STORES.PERMISSIONS, 'readwrite');
+    tx.objectStore(STORES.PERMISSIONS).put(permission);
+    return new Promise((r) => tx.oncomplete = () => r());
   }
 }
